@@ -13,3 +13,6 @@ Mismatches found (all real, all in BOTH versions):
 Engineering check (between_samples.py, 1 ms 100 g half-sine, Q=10, fs=10 kHz):
 - Sampled peak misses the true peak by 0.1% (fs/fn=50), 2.0% (10), 5.4% (2.5).
 - Fix options: validate Q>0.5 (or handle Q=0.5 via limit Sp->1), reject fn>=fs/2, upsample when fs/fn<10.
+Second-model review fix (2026-10-20): residual response added (1.5 periods of zero input after the record, both
+versions and the exact reference). [0,100,0] g at fs=1 kHz, fn=10 Hz, Q=10 went 1.016 g -> 5.848 g.
+1.5 vs 20 periods: 0 shortfall in 300 random cases. Re-run: port worst 8e-11, vs exact worst 3e-10.

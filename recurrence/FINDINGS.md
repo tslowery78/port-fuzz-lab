@@ -17,3 +17,5 @@ Bugs (in the original Python):
 5. omn = 0 (rigid-body mode) crashes with ZeroDivisionError.
 6. Repeated time stamp (dt = 0): inf/NaN, no error.
 7. Interface: u0/ud0 and eta0/etad0 must be full-length arrays and are overwritten in place.
+Second-model review fix (2026-10-20): C rf_mdof had a fixed 64-mode coefficient array (stack overflow past 64);
+now heap-allocated for any mode count. 200-mode check vs Python: rel 9e-11.

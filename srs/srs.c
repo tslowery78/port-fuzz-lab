@@ -1,4 +1,5 @@
 /* C port of srs.py: Smallwood ramp-invariant SRS, maximax absolute acceleration.
+ * Includes residual response: 1.5 periods of zero input after the record.
  * int srs(const double *accel, long n, double fs, const double *fn, long nf, double Q,
  *         double *pos, double *neg, double *maximax);  returns 0 ok, -1 bad args. */
 #include <math.h>
@@ -25,8 +26,9 @@ int srs(const double *accel, long n, double fs, const double *fn, long nf, doubl
         coeffs(fn[i], fs, Q, b, a);
         /* direct form II transposed, zero initial state (matches scipy lfilter) */
         double z1 = 0.0, z2 = 0.0, ymax = -INFINITY, ymin = INFINITY;
-        for (long k = 0; k < n; k++) {
-            double x = accel[k];
+        long npad = (long)ceil(1.5 * fs / fn[i]);
+        for (long k = 0; k < n + npad; k++) {
+            double x = k < n ? accel[k] : 0.0;
             double y = b[0] * x + z1;
             z1 = b[1] * x - a[1] * y + z2;
             z2 = b[2] * x - a[2] * y;

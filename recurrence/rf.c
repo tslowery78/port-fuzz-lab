@@ -2,6 +2,7 @@
  * Arrays: t[n], p[n] (sdof); p[n_modes*n_points] row-major (mdof). u/ud hold u0/ud0 in [0]
  * and are filled in place, like the Python version. */
 #include <math.h>
+#include <stdlib.h>
 
 void rf_coefficients(double dt, double k, double omn, double zeta, double c8[8]) {
     double beta = zeta * omn, h = dt, omd = omn * sqrt(1 - zeta * zeta);
@@ -35,9 +36,10 @@ void rf_sdof(const double *t, const double *p, long n, double k, double omn, dou
     }
 }
 
-void rf_mdof(const double *t, const double *p, long nm, long np, const double *k,
-             const double *omn, const double *zeta, double *eta, double *etad) {
-    double c[64][8] = {{0}}, last_dt = 0.0;   /* up to 64 modes in the fuzz */
+int rf_mdof(const double *t, const double *p, long nm, long np, const double *k,
+            const double *omn, const double *zeta, double *eta, double *etad) {
+    double (*c)[8] = calloc(nm > 0 ? nm : 1, sizeof *c), last_dt = 0.0;   /* any number of modes */
+    if (!c) return -1;
     for (long i = 0; i < np - 1; i++) {
         double dt = t[i + 1] - t[i];
         if (fabs(dt - last_dt) > 0.00001)
@@ -49,4 +51,6 @@ void rf_mdof(const double *t, const double *p, long nm, long np, const double *k
             ed[i + 1] = c[j][4] * q[i] + c[j][5] * q[i + 1] + c[j][6] * e[i] + c[j][7] * ed[i];
         }
     }
+    free(c);
+    return 0;
 }

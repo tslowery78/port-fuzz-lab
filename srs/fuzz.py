@@ -21,6 +21,7 @@ def exact(x, fs, f, Q):
     wn, z = 2*np.pi*f, 1/(2*Q)
     A = [[0, 1], [-wn**2, -2*z*wn]]; B = [[0], [-1]]; C = [[-wn**2, -2*z*wn]]; D = [[0]]
     sysd = cont2discrete(tuple(np.array(m, float) for m in (A, B, C, D)), 1/fs, method="foh")
+    x = np.concatenate([x, np.zeros(int(np.ceil(1.5 * fs / f)))])   # same residual window as srs()
     _, y, _ = dlsim(sysd, x)
     y = y.ravel(); return max(y.max(), -y.min())
 

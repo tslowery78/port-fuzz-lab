@@ -9,6 +9,7 @@ import rf_functions as rfp
 
 lib = ctypes.CDLL(str(HERE / "librf.dylib")); P = ctypes.POINTER(ctypes.c_double); d = ctypes.c_double; L = ctypes.c_long
 lib.rf_sdof.argtypes = [P, P, L, d, d, d, P, P]
+lib.rf_mdof.restype = ctypes.c_int
 lib.rf_mdof.argtypes = [P, P, L, L, P, P, P, P, P]
 ptr = lambda a: a.ctypes.data_as(P)
 

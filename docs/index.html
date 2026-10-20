@@ -29,7 +29,7 @@
   <p class="lead">Port a trusted dynamics routine to C, feed both the same random inputs, and chase every mismatch.</p>
   <div class="card">
     <div class="big">3 bugs</div>
-    <p>Found in a recurrence-formula integrator (PyLnD) by 2,000 random cases. The C port itself matched to 2e-13.</p>
+    <p>Found in a recurrence-formula integrator (PyLnD) by 2,000 random cases. On normal inputs the C port matched to 2e-13; near-zero time steps blew rounding up to 4e-3.</p>
   </div>
   <div class="card bug">
     <h2>Fast sample rates</h2>
@@ -47,7 +47,7 @@
     <summary>More</summary>
     <p>Also: damping ζ ≥ 1 and rigid-body modes (ω = 0) crash; a repeated time stamp gives inf/NaN.
     The exact reference is a matrix-exponential step with the load linear between points.
-    A second test on a Smallwood SRS found Q = 0.5 returns NaN (Python) or −inf (C), and sampled peaks run 2% low at 10 points per cycle.</p>
+    A second test on a Smallwood SRS found Q = 0.5 returns NaN (Python) or −inf (C), sampled peaks run 2% low at 10 points per cycle, and the first version skipped residual response (fixed).</p>
     <p><a href="https://github.com/tslowery78/port-fuzz-lab">Code and full findings on GitHub</a></p>
   </details>
 </main>

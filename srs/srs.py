@@ -2,6 +2,7 @@
 
 Reference utility (Python). Personal, generic textbook algorithm; no NASA data or code.
 srs(accel, fs, fn, Q) -> (pos, neg, maximax) arrays, one value per natural frequency.
+Includes residual response: each oscillator rings on with zero input for 1.5 periods after the record.
 """
 import numpy as np
 from scipy.signal import lfilter
@@ -29,7 +30,8 @@ def srs(accel, fs, fn, Q=10.0):
     neg = np.empty(fn.size)
     for i, f in enumerate(fn):
         b, a = smallwood_coeffs(f, fs, Q)
-        y = lfilter(b, a, accel)
+        npad = int(np.ceil(1.5 * fs / f))   # residual: free decay peaks within the first period
+        y = lfilter(b, a, np.concatenate([accel, np.zeros(npad)]))
         pos[i] = y.max()
         neg[i] = -y.min()
     return pos, neg, np.maximum(pos, neg)
