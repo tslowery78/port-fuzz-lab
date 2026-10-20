@@ -21,7 +21,9 @@ def exact(x, fs, f, Q):
     wn, z = 2*np.pi*f, 1/(2*Q)
     A = [[0, 1], [-wn**2, -2*z*wn]]; B = [[0], [-1]]; C = [[-wn**2, -2*z*wn]]; D = [[0]]
     sysd = cont2discrete(tuple(np.array(m, float) for m in (A, B, C, D)), 1/fs, method="foh")
-    x = np.concatenate([x, np.zeros(int(np.ceil(1.5 * fs / f)))])   # same residual window as srs()
+    npad = int(np.ceil(1.5 * fs / f + 5 * Q / (np.pi * f) * fs))   # 5 decay time constants, brute force
+    if npad > 300_000: return None
+    x = np.concatenate([x, np.zeros(npad)])
     _, y, _ = dlsim(sysd, x)
     y = y.ravel(); return max(y.max(), -y.min())
 
@@ -59,7 +61,9 @@ for trial in range(int(sys.argv[2]) if len(sys.argv) > 2 else 3000):
         r = dict(trial=trial, kind=str(kind), n=n, fs=fs, fn=float(f), Q=Q, fn_over_fs=float(f/fs),
                  py=float(pv), c=float(cv), port_rel=float(d))
         if Q > 0.5 and f < fs/2 and n > 1 and np.isfinite(pv) and kind not in ("huge", "tiny"):
-            ex = exact(x, fs, f, Q); r["exact"] = float(ex)
+            ex = exact(x, fs, f, Q)
+            if ex is None: rows.append(r); continue
+            r["exact"] = float(ex)
             r["exact_rel"] = float(abs(pv - ex)/ex) if ex > 0 else 0.0
         rows.append(r)
 

@@ -16,3 +16,7 @@ Engineering check (between_samples.py, 1 ms 100 g half-sine, Q=10, fs=10 kHz):
 Second-model review fix (2026-10-20): residual response added (1.5 periods of zero input after the record, both
 versions and the exact reference). [0,100,0] g at fs=1 kHz, fn=10 Hz, Q=10 went 1.016 g -> 5.848 g.
 1.5 vs 20 periods: 0 shortfall in 300 random cases. Re-run: port worst 8e-11, vs exact worst 3e-10.
+Pass-2 review fix: a fixed 1.5-period tail missed later sampled peaks near Nyquist at high Q
+([0,1,-1,0] g, fs=1 kHz, fn=490 Hz, Q=100: 0.980 g -> 1.819 g). Tail now runs in closed form until the decay
+envelope is below the peaks found. Brute-force 50-time-constant tail, 400 cases (Q to 200): shortfall 2e-15.
+Fuzz re-run: port worst 8e-11 (only mismatches still Q<=0.5), vs exact (5 time constants) worst 2e-11.
