@@ -1,0 +1,4 @@
+*.dylib
+*_results.json
+__pycache__/
+.venv/

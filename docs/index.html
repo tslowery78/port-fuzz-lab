@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Port + Fuzz Lab · SideQuest Forge</title>
+<meta name="description" content="Port a trusted dynamics routine to C, fuzz both, and chase every mismatch.">
+<style>
+  :root { --bg:#0f1420; --card:#1a2233; --ink:#eef2f8; --dim:#9aa7bd; --accent:#f5a524; --bad:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:18px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:48px 20px 32px; }
+  h1 { font-size:2.4rem; margin:0 0 6px; }
+  .lead { color:var(--dim); margin:0 0 28px; font-size:1.15rem; }
+  .big { font-size:4rem; font-weight:800; color:var(--accent); line-height:1; }
+  .card { background:var(--card); border-radius:14px; padding:22px; margin:0 0 16px; }
+  .card h2 { margin:0 0 6px; font-size:1.3rem; }
+  .card p { margin:0; color:var(--dim); }
+  .bug h2 { color:var(--bad); }
+  details { margin:24px 0; color:var(--dim); }
+  summary { cursor:pointer; color:var(--ink); font-weight:600; }
+  a { color:var(--accent); }
+  footer { max-width:760px; margin:0 auto; padding:24px 20px 48px; color:var(--dim); font-size:.95rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Port + Fuzz Lab</h1>
+  <p class="lead">Port a trusted dynamics routine to C, feed both the same random inputs, and chase every mismatch.</p>
+  <div class="card">
+    <div class="big">3 bugs</div>
+    <p>Found in a recurrence-formula integrator (PyLnD) by 2,000 random cases. The C port itself matched to 2e-13.</p>
+  </div>
+  <div class="card bug">
+    <h2>Fast sample rates</h2>
+    <p>Above 100 kHz the coefficients are never computed. Python crashes; the C port returns all zeros.</p>
+  </div>
+  <div class="card bug">
+    <h2>Jittery time steps</h2>
+    <p>A step change under 10 µs keeps stale coefficients: up to 25–200% error. A relative check fixes it (1e-14).</p>
+  </div>
+  <div class="card bug">
+    <h2>Very fine steps</h2>
+    <p>The closed-form coefficients cancel when ω·dt is tiny: 4e-5 error at 63,000 points per cycle.</p>
+  </div>
+  <details>
+    <summary>More</summary>
+    <p>Also: damping ζ ≥ 1 and rigid-body modes (ω = 0) crash; a repeated time stamp gives inf/NaN.
+    The exact reference is a matrix-exponential step with the load linear between points.
+    A second test on a Smallwood SRS found Q = 0.5 returns NaN (Python) or −inf (C), and sampled peaks run 2% low at 10 points per cycle.</p>
+    <p><a href="https://github.com/tslowery78/port-fuzz-lab">Code and full findings on GitHub</a></p>
+  </details>
+</main>
+<footer>
+  Made by Tom Lowery at <a href="https://sidequestforgestudio.com">SideQuest Forge</a>.
+  For learning and quick estimates, not a substitute for checked analysis.
+</footer>
+</body>
+</html>
